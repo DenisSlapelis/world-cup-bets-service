@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import * as express from 'express';
 import * as cors from 'cors';
 import environment from '@env';
-// import * as routes from './routes';
+import { router as routes } from './routes';
 import { logger, errorLogger } from '@logger';
 
 const app = express();
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(logger);
 
 // Api routes.
-// app.use(routes.default);
+app.use(routes);
 
 // Api error logger.
 app.use(errorLogger);

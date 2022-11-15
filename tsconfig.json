@@ -15,7 +15,9 @@
             "@app/*": ["./src/app/*"],
             "@env": ["./src/environment/environment"],
             "@firebase": ["./src/firebase/firebase.utils"],
-            "@logger": ["./src/logger/index"]
+            "@logger": ["./src/logger/index"],
+            "@database": ["./src/database/index"],
+            "@helpers": ["./src/helpers/index"]
         }
     },
     "compileOnSave": true,
