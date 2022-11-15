@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "lib": ["ES2021"],
+        "module": "commonjs",
+        "target": "ES2021",
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "outDir": "lib",
+        "sourceMap": true,
+        "strict": true,
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@app/*": ["./src/app/*"],
+            "@env": ["./src/environment/environment"],
+            "@firebase": ["./src/firebase/firebase.utils"],
+            "@logger": ["./src/logger/index"]
+        }
+    },
+    "compileOnSave": true,
+    "include": ["src", "tests"],
+    "exclude": ["src/swagger"]
+}

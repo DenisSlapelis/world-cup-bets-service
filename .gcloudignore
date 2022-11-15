@@ -1,0 +1,12 @@
+key
+node_modules
+.editorconfig
+.env
+.env.example
+.gitignore
+.prettierrc.json
+cloudbuild.yaml
+README.md
+tsconfig.build.json
+tsconfig.json
+tslint.json
