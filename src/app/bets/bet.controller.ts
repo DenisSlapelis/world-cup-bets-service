@@ -41,7 +41,7 @@ export class BetController {
         */
 
         try {
-            const result = await this.service.create();
+            const result = await this.service.create(req.body);
 
             res.status(201).json(result);
         } catch (err: any) {
@@ -70,7 +70,8 @@ export class BetController {
     */
 
         try {
-            const result = await this.service.getBetsByUser();
+            const userId = 1;
+            const result = await this.service.findAllByUser(userId);
 
             res.status(200).json(result);
         } catch (err: any) {

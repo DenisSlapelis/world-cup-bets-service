@@ -11,6 +11,8 @@
         "allowJs": true,
         "resolveJsonModule": true,
         "baseUrl": ".",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "paths": {
             "@app/*": ["./src/app/*"],
             "@env": ["./src/environment/environment"],

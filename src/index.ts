@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as cors from 'cors';
+import express from 'express';
+import cors from 'cors';
 import environment from '@env';
 import { router as routes } from './routes';
 import { logger, errorLogger } from '@logger';
