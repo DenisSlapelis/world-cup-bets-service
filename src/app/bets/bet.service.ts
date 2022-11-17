@@ -148,7 +148,7 @@ export class BetService {
 
     getStatus = (bet: BetResponse, match: MatchResponse) => {
        const totalPoints = this.calculatePoints(bet, match);
-       const canEdit = dayjs().isBefore(match.matchDate);
+       const canEdit = dayjs().isBefore(match.matchDate) && !match.scoreA && !match.scoreB;
 
        return {
             totalPoints,
