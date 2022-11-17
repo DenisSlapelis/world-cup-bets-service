@@ -40,7 +40,7 @@ export class TeamController {
         */
 
         try {
-            const result = await this.service.getTeams();
+            const result = await this.service.findAll();
 
             res.status(200).json(result);
         } catch (err: any) {
