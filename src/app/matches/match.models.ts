@@ -1,4 +1,5 @@
 import { BetResponse } from '@app/bets/bet.models';
+import { TeamResponse } from '@app/teams/teams.models';
 import { RowDataPacket } from 'mysql2';
 
 export enum MatchTypeENUM {
@@ -33,11 +34,11 @@ export enum MatchTypeWeightsENUM {
     FINAL = 3,
 }
 
-export interface MatchResponse extends RowDataPacket {
+export interface IMatch extends RowDataPacket {
     id: number;
     cupId: number;
-    teamAId: number;
-    teamBId: number;
+    teamIdA: number;
+    teamIdB: number;
     scoreA?: number;
     scoreB?: number;
     type: MatchTypeENUM;
@@ -46,6 +47,52 @@ export interface MatchResponse extends RowDataPacket {
     updatedAt?: Date;
 }
 
-export interface MatchResponseWithBets extends MatchResponse {
-    bets: Array<BetResponse>;
+export interface GeralMatchDB extends RowDataPacket {
+    match_id: number;
+    match_cup_id: number;
+    match_score_a: number;
+    match_score_b: number;
+    match_type: MatchTypeENUM;
+    match_date: Date;
+    team_a_id: number;
+    team_a_name: string;
+    team_a_tag: string;
+    team_a_avatar: string;
+    team_b_id: number;
+    team_b_name: string;
+    team_b_tag: string;
+    team_b_avatar: string;
+    bet_id: number;
+    bet_score_a: number;
+    bet_score_b: number;
+    user_id: number;
+    user_google_id: string;
+    user_avatar: string;
+}
+
+export interface MatchResponse {
+    id: number;
+    cupId: number;
+    scoreA?: number;
+    scoreB?: number;
+    type: MatchTypeENUM;
+    matchDate: Date;
+    teamA: TeamResponse;
+    teamB: TeamResponse;
+    bet?: BetResponse;
+}
+
+export interface MatchData {
+    id: number;
+    cupId: number;
+    teamIdA: number;
+    teamIdB: number;
+    scoreA?: number;
+    scoreB?: number;
+    type: MatchTypeENUM;
+    matchDate: Date;
+}
+
+export interface MatchResponseGroupByType {
+    [key: string]: Array<MatchResponse>;
 }

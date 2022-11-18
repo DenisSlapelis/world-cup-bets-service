@@ -1,11 +1,11 @@
-import { BetDTO, BetResponse, BetUpdateDTO } from './bet.models';
+import { BetDTO, IBet, BetUpdateDTO, BetResponse } from './bet.models';
 import { database } from '@database';
 import { matchService } from '@app/matches/match.service';
 import dayjs = require('dayjs');
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import { MatchResponse, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
+import { IMatch, MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
 
 export class BetService {
     constructor() {
@@ -14,8 +14,8 @@ export class BetService {
         dayjs.extend(isSameOrAfter);
     }
 
-    findAllByUser = async (userId: number): Promise<Array<BetResponse>> => {
-        return database.execute<BetResponse[]>(`
+    findAllByUser = async (userId: number): Promise<Array<IBet>> => {
+        return database.execute<IBet[]>(`
             SELECT
                 id,
                 user_id AS userId,
@@ -29,8 +29,8 @@ export class BetService {
         `, [userId]);
     };
 
-    findOneById = async (id: number): Promise<BetResponse> => {
-        const [result] = await database.execute<BetResponse[]>(`
+    findOneById = async (id: number): Promise<IBet> => {
+        const [result] = await database.execute<IBet[]>(`
             SELECT
                 id,
                 user_id AS userId,
@@ -97,21 +97,21 @@ export class BetService {
         return 'DRAW';
     }
 
-    correctResult = (bet: BetResponse, match: MatchResponse) => {
+    correctResult = (bet: BetResponse, match: MatchData) => {
         const betWinner = this.calculateWinner(bet);
         const matchWinner = this.calculateWinner(match);
 
         return betWinner === matchWinner;
     }
 
-    correctOneTeamScore = (bet: BetResponse, match: MatchResponse) => {
+    correctOneTeamScore = (bet: BetResponse, match: MatchData) => {
         const correctScoreA = bet.scoreA === match.scoreA;
         const correctScoreB = bet.scoreB === match.scoreB;
 
         return (correctScoreA && !correctScoreB) || (!correctScoreA && correctScoreB);
     }
 
-    correctBothScore = (bet: BetResponse, match: MatchResponse) => {
+    correctBothScore = (bet: BetResponse, match: MatchData) => {
         const correctScoreA = bet.scoreA === match.scoreA;
         const correctScoreB = bet.scoreB === match.scoreB;
 
@@ -124,7 +124,7 @@ export class BetService {
         return Math.imul(basePoints, weights[matchType]);
     }
 
-    calculatePoints = (bet: BetResponse, match: MatchResponse) => {
+    calculatePoints = (bet: BetResponse, match: MatchData) => {
         const points = [];
         const ONE_TEAM_SCORE = 1;
         const WINNER_OR_DRAW = 2;
@@ -140,14 +140,13 @@ export class BetService {
 
        if (this.correctBothScore(bet, match)) {
             points.push(EXACT_SCORE);
-            match.type
        }
 
         return points.reduce((prev: number, current: number) => prev + this.applyWeightByRound(current, match.type), 0);
     }
 
-    getStatus = (bet: BetResponse, match: MatchResponse) => {
-       const totalPoints = this.calculatePoints(bet, match);
+    getStatus = (bet: BetResponse, match: MatchData) => {
+       const totalPoints = bet.scoreA && bet.scoreB ? this.calculatePoints(bet, match) : 0;
        const canEdit = dayjs().isBefore(match.matchDate) && !match.scoreA && !match.scoreB;
 
        return {
