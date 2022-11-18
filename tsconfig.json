@@ -23,6 +23,6 @@
         }
     },
     "compileOnSave": true,
-    "include": ["src", "tests"],
+    "include": ["src/**/*.ts", "tests/**/*.ts"],
     "exclude": ["src/swagger"]
 }

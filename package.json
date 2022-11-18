@@ -2,11 +2,11 @@
     "name": "world-cup-bets-service",
     "version": "1.0.0",
     "description": "A service to save wolrd cup bets",
-    "main": "lib/index.js",
+    "main": "./lib/index.js",
     "scripts": {
         "start:dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules src/index.ts",
         "build": "tsc --project tsconfig.build.json",
-        "start": "node .",
+        "start": "ts-node --require tsconfig-paths/register .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
