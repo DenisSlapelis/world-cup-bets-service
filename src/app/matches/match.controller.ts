@@ -70,10 +70,9 @@ export class MatchController {
         */
 
         try {
-            const includeBets = !!(req.query?.includeBets);
             const userId = 1;
 
-            const result = await this.service.findAllByCup(userId, includeBets);
+            const result = await this.service.findAllByCup(userId);
 
             res.status(200).json(result);
         } catch (err: any) {

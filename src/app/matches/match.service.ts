@@ -2,7 +2,7 @@ import { GeralMatchDB, IMatch, MatchData } from './match.models';
 import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
-import { BetResponse, IBet } from '@app/bets/bet.models';
+import { BetResponse } from '@app/bets/bet.models';
 
 export class MatchService {
 
