@@ -5,7 +5,7 @@ import dayjs = require('dayjs');
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import { IMatch, MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
+import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
 
 export class BetService {
     constructor() {
