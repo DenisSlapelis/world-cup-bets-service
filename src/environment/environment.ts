@@ -18,7 +18,7 @@ class Environment {
     private constructor() {
         // Code execution vars
         this.listenMode = process.env.LISTEN_MODE;
-        this.listenPort = process.env.LISTEN_PORT;
+        this.listenPort = process.env.PORT;
         this.nodeEnv = process.env.NODE_ENV;
 
         // External project conf vars
