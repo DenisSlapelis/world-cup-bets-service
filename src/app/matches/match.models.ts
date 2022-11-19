@@ -96,3 +96,13 @@ export interface MatchData {
 export interface MatchResponseGroupByType {
     [key: string]: Array<MatchResponse>;
 }
+
+export interface CreateMatchDTO {
+    cupId: number;
+    teamIdA: number;
+    teamIdB: number;
+    scoreA?: number;
+    scoreB?: number;
+    type: MatchTypeENUM;
+    matchDate: Date;
+}

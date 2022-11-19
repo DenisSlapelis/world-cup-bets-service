@@ -41,7 +41,7 @@ export class MatchController {
         */
 
         try {
-            const result = await this.service.create();
+            const result = await this.service.create(req.body);
 
             res.status(201).json(result);
         } catch (err: any) {
@@ -70,7 +70,7 @@ export class MatchController {
         */
 
         try {
-            const userId = 1;
+            const userId = req.query.userId;
 
             const result = await this.service.findAllByCup(userId);
 

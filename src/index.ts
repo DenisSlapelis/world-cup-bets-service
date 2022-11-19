@@ -4,11 +4,14 @@ import cors from 'cors';
 import environment from '@env';
 import { router as routes } from './routes';
 import { logger, errorLogger } from '@logger';
+import { getUserMiddleware } from './routes/middlewares';
 
 const app = express();
 
 // CORS
 app.use(cors());
+
+app.use(getUserMiddleware);
 
 // JSON
 app.use(express.json());
@@ -31,7 +34,5 @@ if (environment.listenMode === 'TRUE') {
 
     app.listen(port);
 }
-
-console.log('== teste');
 
 export const syncWatchLaterService = functions.https.onRequest(app);

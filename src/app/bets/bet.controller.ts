@@ -41,6 +41,10 @@ export class BetController {
         */
 
         try {
+            const userId = req.query.userId;
+
+            req.body.userId = userId;
+
             const result = await this.service.create(req.body);
 
             res.status(201).json(result);
@@ -70,7 +74,8 @@ export class BetController {
     */
 
         try {
-            const userId = 1;
+            const userId = req.query.userId;
+
             const result = await this.service.findAllByUser(userId);
 
             res.status(200).json(result);

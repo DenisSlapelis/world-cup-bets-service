@@ -1,4 +1,4 @@
-import { GeralMatchDB, IMatch, MatchData } from './match.models';
+import { CreateMatchDTO, GeralMatchDB, IMatch, MatchData } from './match.models';
 import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
@@ -132,10 +132,14 @@ export class MatchService {
         return _.groupBy(result, "matchType");
     };
 
-    create = async (): Promise<void> => {
-        const sql = 'INSERT INTO match (user_id, match_id, score_a, score_b) VALUES (?, ?, ?, ?)';
+    create = async (match: CreateMatchDTO): Promise<void> => {
+        const {cupId, teamIdA, teamIdB, scoreA, scoreB, type, matchDate} = match;
 
-        await database.execute(sql, [1, 1, 1, 2]);
+        const params = [cupId, teamIdA, teamIdB, scoreA, scoreB, type, matchDate];
+
+        const sql = 'INSERT INTO match (cup_id, team_id_a, team_id_b, score_a, score_b, type, match_date) VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+        await database.execute(sql, params);
     };
 }
 
