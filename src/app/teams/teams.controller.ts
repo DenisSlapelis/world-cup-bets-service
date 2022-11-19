@@ -5,8 +5,10 @@ import { formatErrorResponse } from '../../routes/routes.utils';
 export class TeamController {
     service: TeamService;
     routes: Router;
+    routePath: string;
 
     constructor() {
+        this.routePath = '/teams';
         this.service = teamService;
         this.routes = this.configRoutes();
     }

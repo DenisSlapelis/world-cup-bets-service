@@ -5,8 +5,10 @@ import { formatErrorResponse } from '../../routes/routes.utils';
 export class UserController {
     service: UserService;
     routes: Router;
+    routePath: string;
 
     constructor() {
+        this.routePath = '/users';
         this.service = userService;
         this.routes = this.configRoutes();
     }

@@ -8,8 +8,8 @@ import { userController } from '@app/users/user.controller';
 
 export const router = Router();
 
-router.use('/teams', teamController.routes);
-router.use('/bets', betController.routes);
-router.use('/matches', matchController.routes);
-router.use('/users', userController.routes);
+router.use(teamController.routePath, teamController.routes);
+router.use(betController.routePath, betController.routes);
+router.use(matchController.routePath, matchController.routes);
+router.use(userController.routePath, userController.routes);
 // router.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));

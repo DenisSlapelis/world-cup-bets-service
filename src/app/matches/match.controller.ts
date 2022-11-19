@@ -5,8 +5,10 @@ import { formatErrorResponse } from '../../routes/routes.utils';
 export class MatchController {
     private service: MatchService;
     routes: Router;
+    routePath: string;
 
     constructor() {
+        this.routePath = '/matches'
         this.service = matchService;
         this.routes = this.configRoutes();
     }
