@@ -16,6 +16,7 @@ export class BetController {
 
         router.post('/', this.create);
         router.get('/', this.getBetsByUser);
+        router.patch('/', this.update);
 
         return router;
     }
@@ -45,7 +46,7 @@ export class BetController {
 
             req.body.userId = userId;
 
-            const result = await this.service.create(req.body);
+            const result = await this.service.create(req.body, userId);
 
             res.status(201).json(result);
         } catch (err: any) {
@@ -77,6 +78,38 @@ export class BetController {
             const userId = req.query.userId;
 
             const result = await this.service.findAllByUser(userId);
+
+            res.status(200).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+
+    update = async (req: any, res: any) => {
+        /*
+            == Description
+            #swagger.tags = ['Bet']
+            #swagger.description = 'Creats a Bet.'
+            #swagger.path = '/bets'
+
+            == Successful response:
+            #swagger.responses[201] = {
+                schema: { $ref: "#/definitions/Bet" },
+                description: 'JSON data'
+            }
+
+            == Error responses:
+            #swagger.responses[500] = {
+                schema: { $ref: "#/definitions/CustomError" },
+                description: 'Unexpected error'
+            }
+        */
+
+        try {
+            const userId = req.query.userId;
+
+            const result = await this.service.update(req.body, userId);
 
             res.status(200).json(result);
         } catch (err: any) {

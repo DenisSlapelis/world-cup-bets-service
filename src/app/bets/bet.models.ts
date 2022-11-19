@@ -18,13 +18,13 @@ export interface BetResponse {
     scoreB?: number;
 }
 
-export interface BetDTO {
+export interface BetCreateDTO {
     userId: number;
     matchId: number;
     scoreA: number;
     scoreB: number;
 }
 
-export interface BetUpdateDTO extends BetDTO {
-    betId: number;
+export interface BetUpdateDTO extends BetCreateDTO {
+    id: number;
 }

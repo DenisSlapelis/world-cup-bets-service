@@ -1,4 +1,4 @@
-import { BetDTO, IBet, BetUpdateDTO, BetResponse } from './bet.models';
+import { BetCreateDTO, IBet, BetUpdateDTO, BetResponse } from './bet.models';
 import { database } from '@database';
 import { matchService } from '@app/matches/match.service';
 import dayjs = require('dayjs');
@@ -14,7 +14,7 @@ export class BetService {
         dayjs.extend(isSameOrAfter);
     }
 
-    findAllByUser = async (userId: number): Promise<Array<IBet>> => {
+    findAllByUser = async (userId: number, matchId?: number): Promise<Array<IBet>> => {
         return database.execute<IBet[]>(`
             SELECT
                 id,
@@ -26,7 +26,8 @@ export class BetService {
                 bet
             WHERE
                 user_id = ?
-        `, [userId]);
+                ${matchId ? 'AND match_id = ?' : ''}
+        `, [userId, matchId]);
     };
 
     findOneById = async (id: number): Promise<IBet> => {
@@ -46,44 +47,74 @@ export class BetService {
         return result;
     };
 
-    create = async (bet: BetDTO): Promise<void> => {
-        await this.checkCreateValidations(bet);
+    create = async (bets: Array<BetCreateDTO>, userId: number): Promise<void> => {
+        const promises = bets.map(async (bet) => {
+            await this.checkCreateValidations(bet, userId);
 
-        const sql = 'INSERT INTO bet (user_id, match_id, score_a, score_b) VALUES (?, ?, ?, ?)';
+            const { matchId, scoreA, scoreB } = bet;
 
-        const { userId, matchId, scoreA, scoreB } = bet;
+            const params = [userId, matchId, scoreA, scoreB];
 
-        await database.execute(sql, [userId, matchId, scoreA, scoreB]);
+            const sql = 'INSERT INTO bet (user_id, match_id, score_a, score_b) VALUES (?, ?, ?, ?)';
+
+            await database.execute(sql, params);
+        });
+
+        await Promise.all(promises);
     };
 
-    checkCreateValidations = async (bet: BetDTO) => {
-        const match = await matchService.findOneById(bet.matchId);
+    checkCreateValidations = async (bet: BetCreateDTO, userId: number) => {
+         const [match, existingBet] = await Promise.all([
+            matchService.findOneById(bet.matchId),
+            this.findAllByUser(bet.userId, bet.matchId),
+         ]);
+
+         if (existingBet){
+            throw new Error('Você já criou uma aposta para essa partida');
+         }
+
+        if (bet.userId !== userId) {
+            throw new Error('Você não pode criar uma aposta para um outro usuário, seu pimlantra.');
+        }
 
         if (dayjs().isSameOrAfter(match.matchDate)){
             throw new Error('Você não pode apostar em uma partida que já iniciou.');
         }
     }
 
-    update = async (bet: BetUpdateDTO): Promise<void> => {
-        await this.checkUpdateValidations(bet);
+    update = async (bets: Array<BetUpdateDTO>, userId: number): Promise<void> => {
+        const promises = bets.map(async bet => {
+            bet.userId = userId;
+            await this.checkUpdateValidations(bet);
 
-        const sql = 'UPDATE bet SET score_a = ?, score_b = ? WHERE id = ?';
+            const sql = 'UPDATE bet SET score_a = ?, score_b = ? WHERE id = ?';
 
-        const { betId, scoreA, scoreB } = bet;
+            const { id, scoreA, scoreB } = bet;
 
-        await database.execute(sql, [scoreA, scoreB, betId]);
+            const params = [id, scoreA, scoreB];
+
+            await database.execute(sql, params);
+        });
+
+        await Promise.all(promises);
     };
 
     checkUpdateValidations = async (bet: BetUpdateDTO) => {
-        const match = await matchService.findOneById(bet.matchId);
-        const existingBet = await this.findOneById(bet.betId);
+        const [match, existingBet] = await Promise.all([
+            matchService.findOneById(bet.matchId),
+            this.findOneById(bet.id),
+        ]);
 
-        if (bet.userId !== existingBet.userId){
+        if (bet.userId != existingBet.userId){
             throw new Error('Você não pode alterar a aposta de outro usuário, seu sujo.');
         }
 
         if (dayjs().isSameOrAfter(match.matchDate)){
             throw new Error('Você não pode alterar a aposta de uma partida que já iniciou.');
+        }
+
+        if(!bet.id || !bet.scoreA || !bet.scoreB) {
+            throw new Error('Parâmetros inválidos');
         }
     }
 
