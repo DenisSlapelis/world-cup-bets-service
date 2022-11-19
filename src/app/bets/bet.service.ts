@@ -209,8 +209,8 @@ export class BetService {
         excelData.forEach((row, idx) => {
             const [teamNameA, scoreA, scoreB, teamNameB] = row;
 
-            const teamIdA = teams[teamNameA];
-            const teamIdB = teams[teamNameB];
+            const teamIdA = teams[teamNameA.toString().replaceAll('_', ' ')];
+            const teamIdB = teams[teamNameB.toString().replaceAll('_', ' ')];
             const matchId = matches[`${teamIdA}_${teamIdB}`];
 
             if (!matchId) throw new Error(`Partida não encontrada [${idx}] - ${teamNameA}, ${scoreA}, ${scoreB}, ${teamNameB}`);
