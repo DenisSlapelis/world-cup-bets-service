@@ -5,8 +5,10 @@ import { formatErrorResponse } from '../../routes/routes.utils';
 export class BetController {
     service: BetService;
     routes: Router;
+    routePath: string;
 
     constructor() {
+        this.routePath = '/bets';
         this.service = betService;
         this.routes = this.configRoutes();
     }
@@ -15,6 +17,7 @@ export class BetController {
         const router = Router();
 
         router.post('/', this.create);
+        router.post('/import', this.import);
         router.get('/', this.getBetsByUser);
         router.patch('/', this.update);
 
@@ -49,6 +52,18 @@ export class BetController {
             const result = await this.service.create(req.body, userId);
 
             res.status(201).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+    import = async (req: any, res: any) => {
+        try {
+            const userId = req.query.userId;
+
+            await this.service.import(userId);
+
+            res.status(201).json();
         } catch (err: any) {
             res.status(500).json(formatErrorResponse(err, res));
         }

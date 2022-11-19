@@ -6,6 +6,8 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
+import { teamService } from '@app/teams/teams.service';
+import { excelData } from './import-data';
 
 export class BetService {
     constructor() {
@@ -184,6 +186,44 @@ export class BetService {
             totalPoints,
             canEdit,
        };
+    }
+
+    import = async (userId: number) => {
+        const [matchData, teamData] = await Promise.all([
+            matchService._findAllByCup(1),
+            teamService.findAll(),
+        ]);
+
+        const matches: any = {};
+        const teams: any = {};
+        const bets: Array<BetCreateDTO> = [];
+
+        teamData.forEach(team => {
+            teams[team.name] = team.id;
+        });
+
+        matchData.forEach(match => {
+            matches[`${match.teamIdA}_${match.teamIdB}`] = match.id;
+        })
+
+        excelData.forEach((row, idx) => {
+            const [teamNameA, scoreA, scoreB, teamNameB] = row;
+
+            const teamIdA = teams[teamNameA];
+            const teamIdB = teams[teamNameB];
+            const matchId = matches[`${teamIdA}_${teamIdB}`];
+
+            if (!matchId) throw new Error(`Partida não encontrada [${idx}] - ${teamNameA}, ${scoreA}, ${scoreB}, ${teamNameB}`);
+
+            bets.push({
+                userId: userId,
+                matchId,
+                scoreA: parseInt(scoreA.toString()),
+                scoreB: parseInt(scoreB.toString()),
+            });
+        });
+
+        await this.create(bets, userId);
     }
 }
 
