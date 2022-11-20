@@ -75,7 +75,7 @@ export class BetService {
             throw new Error('Você já criou uma aposta para essa partida');
          }
 
-        if (bet.userId !== userId) {
+        if (bet.userId != userId) {
             throw new Error('Você não pode criar uma aposta para um outro usuário, seu pimlantra.');
         }
 
