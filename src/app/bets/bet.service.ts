@@ -9,6 +9,7 @@ import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/mat
 import { teamService } from '@app/teams/teams.service';
 import { excelData } from './import-data';
 import { isNaN, isNull, isNumber } from 'lodash';
+import _ = require('lodash');
 
 export class BetService {
     constructor() {
@@ -51,19 +52,25 @@ export class BetService {
     };
 
     create = async (bets: Array<BetCreateDTO>, userId: number): Promise<void> => {
-        const promises = bets.map(async (bet) => {
-            await this.checkCreateValidations(bet, userId);
+        const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
 
-            const { matchId, scoreA, scoreB } = bet;
+        const allBets = _.chunk(bets, parseInt(perChunk.toString()));
 
-            const params = [userId, matchId, scoreA, scoreB];
+        for (const betArr of allBets) {
+            const promises = betArr.map(async (bet) => {
+                await this.checkCreateValidations(bet, userId);
 
-            const sql = 'INSERT INTO bet (user_id, match_id, score_a, score_b) VALUES (?, ?, ?, ?)';
+                const { matchId, scoreA, scoreB } = bet;
 
-            await database.execute(sql, params);
-        });
+                const params = [userId, matchId, scoreA, scoreB];
 
-        await Promise.all(promises);
+                const sql = 'INSERT INTO bet (user_id, match_id, score_a, score_b) VALUES (?, ?, ?, ?)';
+
+                await database.execute(sql, params);
+            });
+
+            await Promise.all(promises);
+        }
     };
 
     checkCreateValidations = async (bet: BetCreateDTO, userId: number) => {
@@ -82,19 +89,25 @@ export class BetService {
     }
 
     update = async (bets: Array<BetUpdateDTO>, userId: number): Promise<void> => {
-        const promises = bets.map(async bet => {
-            await this.checkUpdateValidations(bet, userId);
+        const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
 
-            const sql = 'UPDATE bet SET score_a = ?, score_b = ? WHERE id = ?';
+        const allBets = _.chunk(bets, parseInt(perChunk.toString()));
 
-            const { id, scoreA, scoreB } = bet;
+        for (const betArr of allBets) {
+            const promises = betArr.map(async bet => {
+                await this.checkUpdateValidations(bet, userId);
 
-            const params = [id, scoreA, scoreB];
+                const sql = 'UPDATE bet SET score_a = ?, score_b = ? WHERE id = ?';
 
-            await database.execute(sql, params);
-        });
+                const { id, scoreA, scoreB } = bet;
 
-        await Promise.all(promises);
+                const params = [id, scoreA, scoreB];
+
+                await database.execute(sql, params);
+            });
+
+            await Promise.all(promises);
+        }
     };
 
     checkUpdateValidations = async (bet: BetUpdateDTO, userId: number) => {
