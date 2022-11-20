@@ -8,6 +8,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
 import { teamService } from '@app/teams/teams.service';
 import { excelData } from './import-data';
+import { isNull, isNumber } from 'lodash';
 
 export class BetService {
     constructor() {
@@ -174,8 +175,8 @@ export class BetService {
     }
 
     getStatus = (bet: BetResponse, match: MatchData) => {
-       const totalPoints = bet.scoreA && bet.scoreB ? this.calculatePoints(bet, match) : 0;
-       const canEdit = dayjs().isBefore(match.matchDate) && !match.scoreA && !match.scoreB;
+       const totalPoints = isNumber(bet.scoreA) && isNumber(bet.scoreB) ? this.calculatePoints(bet, match) : 0;
+       const canEdit = dayjs().isBefore(match.matchDate) && isNull(match.scoreA) && isNull(match.scoreB);
 
        return {
             totalPoints,
