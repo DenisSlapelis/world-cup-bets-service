@@ -8,7 +8,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
 import { teamService } from '@app/teams/teams.service';
 import { excelData } from './import-data';
-import { isNull, isNumber } from 'lodash';
+import { isNaN, isNull, isNumber } from 'lodash';
 
 export class BetService {
     constructor() {
@@ -111,7 +111,7 @@ export class BetService {
             throw new Error('Você não pode alterar a aposta de uma partida que já iniciou.');
         }
 
-        if(!bet.id || !bet.scoreA || !bet.scoreB) {
+        if(!bet.id || isNaN(bet.scoreA) || isNaN(bet.scoreB)) {
             throw new Error('Parâmetros inválidos');
         }
     }
