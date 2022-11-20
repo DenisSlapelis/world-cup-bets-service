@@ -55,10 +55,10 @@ export class MatchService {
                 INNER JOIN team t ON m.team_a_id = t.id
                 INNER JOIN team t2 ON m.team_b_id = t2.id
                 LEFT JOIN bet b ON m.id = b.match_id
+                AND b.user_id = ?
                 LEFT JOIN \`user\` u ON b.user_id = u.id
             WHERE
                 cup_id = ?
-                AND u.id = ?
         `, [userId, cupId]);
     };
 
