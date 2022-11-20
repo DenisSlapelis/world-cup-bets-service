@@ -66,17 +66,13 @@ export class BetService {
     };
 
     checkCreateValidations = async (bet: BetCreateDTO, userId: number) => {
-         const [match, existingBet] = await Promise.all([
+        const [match, existingBet] = await Promise.all([
             matchService.findOneById(bet.matchId),
-            this.findAllByUser(bet.userId, bet.matchId),
-         ]);
+            this.findAllByUser(userId, bet.matchId),
+        ]);
 
-         if (existingBet.length){
+        if (existingBet.length){
             throw new Error('Você já criou uma aposta para essa partida');
-         }
-
-        if (bet.userId != userId) {
-            throw new Error('Você não pode criar uma aposta para um outro usuário, seu pimlantra.');
         }
 
         if (dayjs().isSameOrAfter(match.matchDate)){
@@ -86,8 +82,7 @@ export class BetService {
 
     update = async (bets: Array<BetUpdateDTO>, userId: number): Promise<void> => {
         const promises = bets.map(async bet => {
-            bet.userId = userId;
-            await this.checkUpdateValidations(bet);
+            await this.checkUpdateValidations(bet, userId);
 
             const sql = 'UPDATE bet SET score_a = ?, score_b = ? WHERE id = ?';
 
@@ -101,13 +96,13 @@ export class BetService {
         await Promise.all(promises);
     };
 
-    checkUpdateValidations = async (bet: BetUpdateDTO) => {
+    checkUpdateValidations = async (bet: BetUpdateDTO, userId: number) => {
         const [match, existingBet] = await Promise.all([
             matchService.findOneById(bet.matchId),
             this.findOneById(bet.id),
         ]);
 
-        if (bet.userId != existingBet.userId){
+        if (userId != existingBet.userId){
             throw new Error('Você não pode alterar a aposta de outro usuário, seu sujo.');
         }
 
@@ -216,7 +211,6 @@ export class BetService {
             if (!matchId) throw new Error(`Partida não encontrada [${idx}] - ${teamNameA}, ${scoreA}, ${scoreB}, ${teamNameB}`);
 
             bets.push({
-                userId: userId,
                 matchId,
                 scoreA: parseInt(scoreA.toString()),
                 scoreB: parseInt(scoreB.toString()),

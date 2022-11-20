@@ -19,7 +19,6 @@ export interface BetResponse {
 }
 
 export interface BetCreateDTO {
-    userId: number;
     matchId: number;
     scoreA: number;
     scoreB: number;
