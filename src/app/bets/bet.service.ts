@@ -71,7 +71,7 @@ export class BetService {
             this.findAllByUser(bet.userId, bet.matchId),
          ]);
 
-         if (existingBet){
+         if (existingBet.length){
             throw new Error('Você já criou uma aposta para essa partida');
          }
 
@@ -206,7 +206,7 @@ export class BetService {
             matches[`${match.teamIdA}_${match.teamIdB}`] = match.id;
         })
 
-        excelData.forEach((row, idx) => {
+        excelData.forEach((row: any, idx: number) => {
             const [teamNameA, scoreA, scoreB, teamNameB] = row;
 
             const teamIdA = teams[teamNameA.toString().replaceAll('_', ' ')];
