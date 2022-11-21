@@ -44,7 +44,7 @@ export class UserService {
         `, [googleUserId]);
 
         if(!result) {
-            throw new CustomError('Usuário não encontrado.', 404, 'Validation Error', googleUserId);
+            throw new CustomError('Usuário não encontrado.', 404, 'Validation Error', [{id: googleUserId}]);
         }
 
         return result;
