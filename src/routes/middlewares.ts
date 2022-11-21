@@ -25,7 +25,7 @@ export const getUserMiddleware = async (req: Express.Request, res: Express.Respo
 
 const isPublicRoute = (path: string, method: string) => {
     const publicPath = PUBLIC_ROUTES.hasOwnProperty(path);
-    const publicPathMethod = PUBLIC_ROUTES[path].includes(method);
+    const publicPathMethod = PUBLIC_ROUTES[path]?.includes(method);
 
     return publicPath && publicPathMethod;
 }
