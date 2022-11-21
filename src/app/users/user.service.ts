@@ -1,5 +1,6 @@
 import { IUser, UserDTO } from './user.models';
 import { database } from '../../database';
+import { ResultSetHeader } from 'mysql2';
 
 export class UserService {
     constructor() {}
@@ -11,7 +12,9 @@ export class UserService {
 
         const { googleUserId, name, avatar } = user;
 
-        await database.execute(sql, [googleUserId, name, avatar]);
+        const { insertId } = await database.execute<ResultSetHeader>(sql, [googleUserId, name, avatar]);
+
+        return {...user, id: insertId };
     }
 
     findAll = async (): Promise<Array<IUser>> => {

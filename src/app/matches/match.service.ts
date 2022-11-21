@@ -3,6 +3,7 @@ import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
 import { BetResponse } from '@app/bets/bet.models';
+import { ResultSetHeader } from 'mysql2';
 
 export class MatchService {
 
@@ -132,14 +133,16 @@ export class MatchService {
         return _.groupBy(result, "matchType");
     };
 
-    create = async (match: CreateMatchDTO): Promise<void> => {
+    create = async (match: CreateMatchDTO): Promise<MatchData> => {
         const {cupId, teamIdA, teamIdB, scoreA, scoreB, type, matchDate} = match;
 
         const params = [cupId, teamIdA, teamIdB, scoreA, scoreB, type, matchDate];
 
         const sql = 'INSERT INTO match (cup_id, team_id_a, team_id_b, score_a, score_b, type, match_date) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
-        await database.execute(sql, params);
+        const { insertId } = await database.execute<ResultSetHeader>(sql, params);
+
+        return {...match, id:insertId }
     };
 }
 

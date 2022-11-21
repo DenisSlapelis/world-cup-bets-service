@@ -10,6 +10,7 @@ import { teamService } from '@app/teams/teams.service';
 import { excelData } from './import-data';
 import { isNaN, isNull, isNumber } from 'lodash';
 import _ = require('lodash');
+import { ResultSetHeader } from 'mysql2';
 
 export class BetService {
     constructor() {
@@ -51,10 +52,12 @@ export class BetService {
         return result;
     };
 
-    create = async (bets: Array<BetCreateDTO>, userId: number): Promise<void> => {
+    create = async (bets: Array<BetCreateDTO>, userId: number): Promise<Array<BetResponse>> => {
         const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
 
         const allBets = _.chunk(bets, parseInt(perChunk.toString()));
+
+        const result:Array<BetResponse> = [];
 
         for (const betArr of allBets) {
             const promises = betArr.map(async (bet) => {
@@ -66,11 +69,19 @@ export class BetService {
 
                 const sql = 'INSERT INTO bet (user_id, match_id, score_a, score_b) VALUES (?, ?, ?, ?)';
 
-                await database.execute(sql, params);
+                const { insertId } = await database.execute<ResultSetHeader>(sql, params);
+
+                result.push({
+                    id: insertId,
+                    userId,
+                    ...bet,
+                });
             });
 
             await Promise.all(promises);
         }
+
+        return result;
     };
 
     checkCreateValidations = async (bet: BetCreateDTO, userId: number) => {
