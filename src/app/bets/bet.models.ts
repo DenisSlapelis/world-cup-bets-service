@@ -27,3 +27,9 @@ export interface BetCreateDTO {
 export interface BetUpdateDTO extends BetCreateDTO {
     id: number;
 }
+
+export enum BetScoresENUM {
+    ONE_TEAM_SCORE = 1,
+    WINNER_OR_DRAW = 2,
+    EXACT_SCORE = 3,
+}
