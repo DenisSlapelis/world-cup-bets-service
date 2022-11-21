@@ -132,7 +132,7 @@ export class UserController {
         */
 
         try {
-            const result = await this.service.findOneById(1);
+            const result = await this.service.findOneById(req.params.id);
 
             res.status(200).json(result);
         } catch (err: any) {
