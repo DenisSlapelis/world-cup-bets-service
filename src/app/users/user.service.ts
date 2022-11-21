@@ -67,7 +67,7 @@ export class UserService {
     };
 
     checkCreateValidations = async (user: UserDTO) => {
-        const _user = await this.findOneByGoogleId(user.googleUserId);
+        const _user = await this.findOneByGoogleId(user.googleUserId).catch(err => {});
 
         if(_user) {
             throw new Error('Usuário já cadastrado');
