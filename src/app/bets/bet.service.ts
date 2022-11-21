@@ -1,4 +1,4 @@
-import { BetCreateDTO, IBet, BetUpdateDTO, BetResponse, BetScoresENUM } from './bet.models';
+import { BetCreateDTO, IBet, BetUpdateDTO, BetResponse, BetScoreValuesENUM } from './bet.models';
 import { database } from '@database';
 import { matchService } from '@app/matches/match.service';
 import dayjs = require('dayjs');
@@ -185,15 +185,15 @@ export class BetService {
         const points = [];
 
        if (this.correctOneTeamScore(bet, match)){
-            points.push(BetScoresENUM.ONE_TEAM_SCORE);
+            points.push(BetScoreValuesENUM.ONE_TEAM_SCORE);
         }
 
        if (this.correctResult(bet, match)) {
-            points.push(BetScoresENUM.WINNER_OR_DRAW);
+            points.push(BetScoreValuesENUM.WINNER_OR_DRAW);
        }
 
        if (this.correctBothScore(bet, match)) {
-            points.push(BetScoresENUM.EXACT_SCORE);
+            points.push(BetScoreValuesENUM.EXACT_SCORE);
        }
 
         return points.reduce((prev: number, current: number) => prev + this.applyWeightByRound(current, match.type), 0);
