@@ -11,13 +11,14 @@ const app = express();
 // CORS
 app.use(cors());
 
-app.use(getUserMiddleware);
-
 // JSON
 app.use(express.json());
 
 // Api logger.
 app.use(logger);
+
+// Api middlewares.
+app.use(getUserMiddleware);
 
 // Api routes.
 app.use(routes);
