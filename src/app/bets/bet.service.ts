@@ -140,6 +140,10 @@ export class BetService {
     }
 
     correctResult = (bet: BetResponse, match: MatchData) => {
+        if(isNull(match.scoreA) || isNull(match.scoreB)){
+            return false;
+        }
+
         const betWinner = this.calculateWinner(bet);
         const matchWinner = this.calculateWinner(match);
 
