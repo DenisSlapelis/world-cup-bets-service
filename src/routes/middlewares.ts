@@ -12,10 +12,13 @@ export const getUserMiddleware = async (req: Express.Request, res: Express.Respo
     const auth = req?.headers['user-id'] || '';
     const googleUserId = Array.isArray(auth) ? auth[0] : auth;
 
-    const userId = await userService.findOneByGoogleId(googleUserId);
+
+    const userId = await userService.findOneByGoogleId(googleUserId).catch(err =>{
+        res.status(401).json({error: 'Unauthorized', message: 'Unauthorized User'});
+    });
 
     if (!userId) {
-        return res.status(401).json({error: 'Unauthorized', message: 'Unauthorized User'});
+        return;
     }
 
     req.query.userId = userId.id.toString();
