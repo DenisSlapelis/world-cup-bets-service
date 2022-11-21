@@ -107,7 +107,9 @@ export class UserController {
 
             res.status(200).json(result);
         } catch (err: any) {
-            res.status(500).json(formatErrorResponse(err, res));
+            const statusCode = err.status || 500;
+
+            res.status(statusCode).json(formatErrorResponse(err, res));
         }
     };
 

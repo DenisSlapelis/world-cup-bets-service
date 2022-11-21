@@ -1,6 +1,7 @@
 import { IUser, UserDTO } from './user.models';
 import { database } from '../../database';
 import { ResultSetHeader } from 'mysql2';
+import { CustomError } from 'src/routes/routes.model';
 
 export class UserService {
     constructor() {}
@@ -41,6 +42,10 @@ export class UserService {
             WHERE
                 google_user_id = ?
         `, [googleUserId]);
+
+        if(!result) {
+            throw new CustomError('Usuário não encontrado.', 404, 'Validation Error', googleUserId);
+        }
 
         return result;
     };
