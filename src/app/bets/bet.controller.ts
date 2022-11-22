@@ -19,6 +19,7 @@ export class BetController {
         router.post('/', this.create);
         router.post('/import', this.import);
         router.get('/', this.getBetsByUser);
+        router.get('/:id', this.getById);
         router.patch('/', this.update);
 
         return router;
@@ -92,7 +93,21 @@ export class BetController {
         try {
             const userId = req.query.userId;
 
-            const result = await this.service.findAllByUser(userId);
+            const { matchId } = req.query;
+
+            const result = await this.service.findAllByUser(userId, matchId);
+
+            res.status(200).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+    getById = async (req: any, res: any) => {
+        try {
+            const id = req.params.id;
+
+            const result = await this.service.findOneById(id);
 
             res.status(200).json(result);
         } catch (err: any) {
