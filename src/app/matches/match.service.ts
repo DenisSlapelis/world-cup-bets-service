@@ -2,7 +2,6 @@ import { CreateMatchDTO, GeralMatchDB, IMatch, MatchData, UpdateMatchDTO } from 
 import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
-import { BetResponse } from '@app/bets/bet.models';
 import { ResultSetHeader } from 'mysql2';
 
 export class MatchService {
@@ -25,6 +24,26 @@ export class MatchService {
                 \`match\`
             WHERE
                 cup_id = ?
+        `, [cupId]);
+    };
+
+    findAllFinishedMatches = async (cupId: number): Promise<Array<IMatch>> => {
+        return database.execute<Array<IMatch>>(`
+            SELECT
+                id,
+                cup_id AS cupId,
+                team_a_id AS teamIdA,
+                team_b_id AS teamIdB,
+                score_a AS scoreA,
+                score_b AS scoreB,
+                type,
+                match_date AS matchDate
+            FROM
+                \`match\`
+            WHERE
+                cup_id = ?
+                AND score_a IS NOT NULL
+                AND score_b IS NOT NULL
         `, [cupId]);
     };
 
@@ -52,6 +71,7 @@ export class MatchService {
                 b.id AS bet_id,
                 b.score_a AS bet_score_a,
                 b.score_b AS bet_score_b,
+                COALESCE(b.total_points, 0) AS bet_total_points,
                 u.id AS user_id,
                 u.google_user_id AS user_google_id,
                 u.avatar AS user_avatar
@@ -92,7 +112,7 @@ export class MatchService {
         const data = await this.getConsolidatedMatches(userId, filters, 1);
 
         const result = data.map(row => {
-            const baseResult = {
+            return {
                 matchId: row.match_id,
                 matchScoreA: row.match_score_a,
                 matchScoreB: row.match_score_b,
@@ -109,30 +129,9 @@ export class MatchService {
                 betId: row.bet_id,
                 betScoreA: row.bet_score_a,
                 betScoreB: row.bet_score_b,
+                totalPoints: row.bet_total_points,
+                canEdit: betService.getCanEdit(row.match_date, row.match_score_a, row.match_score_b),
             };
-
-            const bet: BetResponse = {
-                id: row.bet_id,
-                matchId: row.match_id,
-                userId: row.user_id,
-                scoreA: row.bet_score_a,
-                scoreB: row.bet_score_b,
-            }
-
-            const match: MatchData = {
-                id: row.match_id,
-                cupId: row.match_cup_id,
-                teamIdA: row.team_a_id,
-                teamIdB: row.team_b_id,
-                scoreA: row.match_score_a,
-                scoreB: row.match_score_b,
-                type: row.match_type,
-                matchDate: row.match_date,
-            }
-
-            const betData = betService.getStatus(bet, match);
-
-            return {...baseResult, ...betData};
         });
 
         return _.groupBy(result, "matchType");
@@ -161,7 +160,14 @@ export class MatchService {
 
         const { changedRows } = await database.execute<ResultSetHeader>(sql, params);
 
-        return { changedRows };
+        if(!changedRows)
+            return {};
+
+        const updatedMatch = await this.findOneById(id);
+
+        await betService.updateBetPointsByMatch(updatedMatch);
+
+        return updatedMatch;
     };
 
 }

@@ -58,6 +58,7 @@ CREATE TABLE bet (
     match_id int UNSIGNED NOT NULL,
     score_a int DEFAULT NULL,
     score_b int DEFAULT NULL,
+    total_points int DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

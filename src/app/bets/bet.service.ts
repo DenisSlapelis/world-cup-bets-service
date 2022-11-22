@@ -8,7 +8,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
 import { teamService } from '@app/teams/teams.service';
 import { excelData } from './import-data';
-import { isNaN, isNull, isNumber } from 'lodash';
+import { isNaN, isNull } from 'lodash';
 import _ = require('lodash');
 import { ResultSetHeader } from 'mysql2';
 
@@ -36,6 +36,23 @@ export class BetService {
             WHERE
                 user_id = ?
                 ${matchId ? 'AND match_id = ?' : ''}
+        `, params);
+    };
+
+    findAllByMatch = async (matchId: number): Promise<Array<IBet>> => {
+        const params = [matchId];
+
+        return database.execute<IBet[]>(`
+            SELECT
+                id,
+                user_id AS userId,
+                match_id AS matchId,
+                score_a AS scoreA,
+                score_b AS scoreB
+            FROM
+                bet
+            WHERE
+                match_id = ?
         `, params);
     };
 
@@ -203,14 +220,8 @@ export class BetService {
         return points.reduce((prev: number, current: number) => prev + this.applyWeightByRound(current, match.type), 0);
     }
 
-    getStatus = (bet: BetResponse, match: MatchData) => {
-       const totalPoints = isNumber(bet.scoreA) && isNumber(bet.scoreB) ? this.calculatePoints(bet, match) : 0;
-       const canEdit = dayjs().isBefore(match.matchDate) && isNull(match.scoreA) && isNull(match.scoreB);
-
-       return {
-            totalPoints,
-            canEdit,
-       };
+    getCanEdit = (matchDate: Date, scoreA: number, scoreB: number) => {
+        return dayjs().isBefore(matchDate) && isNull(scoreA) && isNull(scoreB);
     }
 
     import = async (userId: number) => {
@@ -248,6 +259,36 @@ export class BetService {
         });
 
         await this.create(bets, userId);
+    }
+
+    updateBetPointsByMatch = async (match: MatchData) => {
+        const bets = await this.findAllByMatch(match.id);
+
+        const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
+
+        const allBets = _.chunk(bets, parseInt(perChunk.toString()));
+
+        for (const betArr of allBets) {
+            const promises = betArr.map(async bet => {
+                const totalPoints = this.calculatePoints(bet, match);
+
+                const sql = `UPDATE bet SET total_points = ? WHERE id = ?`;
+
+                const params = [totalPoints, bet.id];
+
+                return database.execute(sql, params);
+            });
+
+            await Promise.all(promises);
+        }
+    }
+
+    recalcAllTotalPoints = async () => {
+        const matches = await matchService.findAllFinishedMatches(1);
+
+        for (const match of matches) {
+            await this.updateBetPointsByMatch(match);
+        }
     }
 }
 

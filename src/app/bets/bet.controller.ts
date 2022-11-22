@@ -18,6 +18,7 @@ export class BetController {
 
         router.post('/', this.create);
         router.post('/import', this.import);
+        router.post('/recalculate', this.recalculatePoints);
         router.get('/', this.getBetsByUser);
         router.get('/:id', this.getById);
         router.patch('/', this.update);
@@ -142,6 +143,16 @@ export class BetController {
             const result = await this.service.update(req.body, userId);
 
             res.status(200).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+    recalculatePoints = async (req: any, res: any) => {
+        try {
+            const result = await this.service.recalcAllTotalPoints();
+
+            res.status(201).json(result);
         } catch (err: any) {
             res.status(500).json(formatErrorResponse(err, res));
         }
