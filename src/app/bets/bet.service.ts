@@ -112,7 +112,7 @@ export class BetService {
 
                 const { id, scoreA, scoreB } = bet;
 
-                const params = [id, scoreA, scoreB];
+                const params = [scoreA, scoreB, id];
 
                 await database.execute(sql, params);
             });
