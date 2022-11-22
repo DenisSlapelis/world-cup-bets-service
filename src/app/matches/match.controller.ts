@@ -54,30 +54,11 @@ export class MatchController {
     };
 
     getAllMatchesByCupAndUser = async (req: any, res: any) => {
-        /*
-            == Description
-            #swagger.tags = ['Match']
-            #swagger.description = 'Get all Matchs.'
-            #swagger.path = '/matchs'
-
-            == Successful response:
-            #swagger.responses[200] = {
-                schema: { $ref: "#/definitions/Match" },
-                description: 'JSON data'
-            }
-
-            == Error responses:
-            #swagger.responses[500] = {
-                schema: { $ref: "#/definitions/CustomError" },
-                description: 'Unexpected error'
-            }
-        */
-
         try {
-            const userId = req.query.userId;
             const filters = req.query;
+            const { reqUserId } = filters;
 
-            const result = await this.service.findAllByCup(userId, filters);
+            const result = await this.service.findAllByCup(reqUserId, filters);
 
             res.status(200).json(result);
         } catch (err: any) {

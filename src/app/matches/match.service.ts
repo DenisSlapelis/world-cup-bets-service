@@ -108,16 +108,21 @@ export class MatchService {
         return result;
     };
 
-    findAllByCup = async (userId: number, filters: Record<string, any>): Promise<any> => {
-        const data = await this.getConsolidatedMatches(userId, filters, 1);
+    findAllByCup = async (reqUserId: number, filters: Record<string, any>): Promise<any> => {
+        const { userId } = filters;
+        const data = await this.getConsolidatedMatches(userId || reqUserId, filters, 1);
 
         const result = data.map(row => {
+            const matchDate = row.match_date;
+            const matchScoreA = row.match_score_a;
+            const matchScoreB = row.match_score_b;
+
             return {
                 matchId: row.match_id,
-                matchScoreA: row.match_score_a,
-                matchScoreB: row.match_score_b,
+                matchScoreA,
+                matchScoreB,
                 matchType: row.match_type,
-                matchDate: row.match_date,
+                matchDate,
                 teamIdA: row.team_a_id,
                 teamNameA: row.team_a_name,
                 teamTagA: row.team_a_tag,
@@ -130,7 +135,7 @@ export class MatchService {
                 betScoreA: row.bet_score_a,
                 betScoreB: row.bet_score_b,
                 totalPoints: row.bet_total_points,
-                canEdit: betService.getCanEdit(row.match_date, row.match_score_a, row.match_score_b),
+                canEdit: reqUserId != userId ? false : betService.getCanEdit(matchDate, matchScoreA, matchScoreB),
             };
         });
 

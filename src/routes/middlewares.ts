@@ -21,7 +21,7 @@ export const getUserMiddleware = async (req: Express.Request, res: Express.Respo
         return;
     }
 
-    req.query.userId = userId.id.toString();
+    req.query.reqUserId = userId.id.toString();
 
     return next();
 }

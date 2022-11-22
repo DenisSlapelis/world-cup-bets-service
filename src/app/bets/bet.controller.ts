@@ -47,11 +47,11 @@ export class BetController {
         */
 
         try {
-            const userId = req.query.userId;
+            const { reqUserId } = req.query;
 
-            req.body.userId = userId;
+            req.body.userId = reqUserId;
 
-            const result = await this.service.create(req.body, userId);
+            const result = await this.service.create(req.body, reqUserId);
 
             res.status(201).json(result);
         } catch (err: any) {
@@ -61,9 +61,9 @@ export class BetController {
 
     import = async (req: any, res: any) => {
         try {
-            const userId = req.query.userId;
+            const { reqUserId, userId } = req.query;
 
-            await this.service.import(userId);
+            await this.service.import(userId || reqUserId);
 
             res.status(201).json();
         } catch (err: any) {
@@ -92,11 +92,11 @@ export class BetController {
     */
 
         try {
-            const userId = req.query.userId;
+            const { reqUserId, userId } = req.query;
 
             const { matchId } = req.query;
 
-            const result = await this.service.findAllByUser(userId, matchId);
+            const result = await this.service.findAllByUser(userId || reqUserId, matchId);
 
             res.status(200).json(result);
         } catch (err: any) {
@@ -138,9 +138,9 @@ export class BetController {
         */
 
         try {
-            const userId = req.query.userId;
+            const { reqUserId } = req.query;
 
-            const result = await this.service.update(req.body, userId);
+            const result = await this.service.update(req.body, reqUserId);
 
             res.status(200).json(result);
         } catch (err: any) {
