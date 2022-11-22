@@ -20,6 +20,10 @@ export class BetService {
     }
 
     findAllByUser = async (userId: number, matchId?: number): Promise<Array<IBet>> => {
+        const params = [userId];
+
+        if(matchId) params.push(matchId);
+
         return database.execute<IBet[]>(`
             SELECT
                 id,
@@ -32,7 +36,7 @@ export class BetService {
             WHERE
                 user_id = ?
                 ${matchId ? 'AND match_id = ?' : ''}
-        `, [userId, matchId]);
+        `, params);
     };
 
     findOneById = async (id: number): Promise<IBet> => {
