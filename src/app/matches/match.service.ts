@@ -135,7 +135,7 @@ export class MatchService {
                 betScoreA: row.bet_score_a,
                 betScoreB: row.bet_score_b,
                 totalPoints: row.bet_total_points,
-                canEdit: reqUserId != userId ? false : betService.getCanEdit(matchDate, matchScoreA, matchScoreB),
+                canEdit: betService.getCanEdit(matchDate, matchScoreA, matchScoreB, reqUserId, userId),
             };
         });
 

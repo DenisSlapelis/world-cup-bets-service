@@ -220,8 +220,13 @@ export class BetService {
         return points.reduce((prev: number, current: number) => prev + this.applyWeightByRound(current, match.type), 0);
     }
 
-    getCanEdit = (matchDate: Date, scoreA: number, scoreB: number) => {
-        return dayjs().isBefore(matchDate) && isNull(scoreA) && isNull(scoreB);
+    getCanEdit = (matchDate: Date, matchScoreA: number, matchScoreB: number, reqUserId: number, userId: number | undefined) => {
+        const sameUser = !userId || reqUserId == userId;
+        const todayIsBeforeMatch = dayjs().isBefore(matchDate);
+        const scoreAIsNull = isNull(matchScoreA);
+        const scoreBIsNull = isNull(matchScoreB);
+
+        return !sameUser ? false : todayIsBeforeMatch && scoreAIsNull && scoreBIsNull;
     }
 
     import = async (userId: number) => {
