@@ -106,3 +106,9 @@ export interface CreateMatchDTO {
     type: MatchTypeENUM;
     matchDate: Date;
 }
+
+export interface UpdateMatchDTO {
+    scoreA?: number;
+    scoreB?: number;
+    matchDate?: Date;
+}

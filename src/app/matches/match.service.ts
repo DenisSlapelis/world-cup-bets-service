@@ -1,4 +1,4 @@
-import { CreateMatchDTO, GeralMatchDB, IMatch, MatchData } from './match.models';
+import { CreateMatchDTO, GeralMatchDB, IMatch, MatchData, UpdateMatchDTO } from './match.models';
 import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
@@ -28,7 +28,11 @@ export class MatchService {
         `, [cupId]);
     };
 
-    getConsolidatedMatches = async (userId: number, cupId: number): Promise<Array<GeralMatchDB>> => {
+    getConsolidatedMatches = async (userId: number, filters: Record<string, any>, cupId: number): Promise<Array<GeralMatchDB>> => {
+        const params = [userId, cupId];
+
+        const { team } = filters;
+
         return database.execute<Array<GeralMatchDB>>(`
             SELECT
                 m.id AS match_id,
@@ -60,7 +64,8 @@ export class MatchService {
                 LEFT JOIN \`user\` u ON b.user_id = u.id
             WHERE
                 cup_id = ?
-        `, [userId, cupId]);
+                ${team ? `AND (UPPER(t.name) LIKE '%${team.toUpperCase()}%' OR UPPER(t2.name) LIKE '%${team.toUpperCase()}%')` : ''}
+        `, params);
     };
 
     findOneById = async (id: number): Promise<IMatch> => {
@@ -83,8 +88,8 @@ export class MatchService {
         return result;
     };
 
-    findAllByCup = async (userId: number): Promise<any> => {
-        const data = await this.getConsolidatedMatches(userId, 1);
+    findAllByCup = async (userId: number, filters: Record<string, any>): Promise<any> => {
+        const data = await this.getConsolidatedMatches(userId, filters, 1);
 
         const result = data.map(row => {
             const baseResult = {
@@ -144,6 +149,21 @@ export class MatchService {
 
         return {...match, id:insertId }
     };
+
+    update = async (id: number, match: UpdateMatchDTO): Promise<Record<string, number | undefined>> => {
+        const { scoreA, scoreB, matchDate } = match;
+
+        const params: Array<any> = [scoreA, scoreB, id];
+
+        if(matchDate) params.splice(2, 0, matchDate);
+
+        const sql = `UPDATE \`match\` SET score_a = ?, score_b = ? ${matchDate ? ', match_date = ?' : ''} WHERE id = ?`;
+
+        const { changedRows } = await database.execute<ResultSetHeader>(sql, params);
+
+        return { changedRows };
+    };
+
 }
 
 export const matchService = new MatchService();

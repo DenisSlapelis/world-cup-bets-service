@@ -18,6 +18,8 @@ export class MatchController {
 
         router.post('/', this.create);
         router.get('/', this.getAllMatchesByCupAndUser);
+        router.get('/:id', this.getById);
+        router.patch('/:id', this.updateById);
 
         return router;
     }
@@ -73,8 +75,33 @@ export class MatchController {
 
         try {
             const userId = req.query.userId;
+            const filters = req.query;
 
-            const result = await this.service.findAllByCup(userId);
+            const result = await this.service.findAllByCup(userId, filters);
+
+            res.status(200).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+    getById = async (req: any, res: any) => {
+        try {
+            const id = req.params.id;
+
+            const result = await this.service.findOneById(id);
+
+            res.status(200).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+    updateById = async (req: any, res: any) => {
+        try {
+            const id = req.params.id;
+
+            const result = await this.service.update(id, req.body);
 
             res.status(200).json(result);
         } catch (err: any) {
