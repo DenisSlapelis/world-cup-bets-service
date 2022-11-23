@@ -1,0 +1,20 @@
+steps:
+    - name: node:16
+      entrypoint: npm
+      args: ['install']
+
+    - name: node:16
+      entrypoint: npm
+      args: ['run', 'build']
+
+    - name: 'gcr.io/cloud-builders/gcloud'
+      args:
+          - functions
+          - deploy
+          - world-cup-bets-service
+          - --trigger-http
+          - --runtime=nodejs16
+          - --entry-point=worldCupBetsService
+          - --region=southamerica-east1
+          - --source=.
+          - --allow-unauthenticated
