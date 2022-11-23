@@ -112,7 +112,7 @@ export class MatchService {
         const { userId } = filters;
         const data = await this.getConsolidatedMatches(userId || reqUserId, filters, 1);
 
-        const result = data.map(row => {
+        const formattedData = data.map(row => {
             const matchDate = row.match_date;
             const matchScoreA = row.match_score_a;
             const matchScoreB = row.match_score_b;
@@ -139,7 +139,15 @@ export class MatchService {
             };
         });
 
-        return _.groupBy(result, "matchType");
+        const result =_.groupBy(formattedData, "matchType");
+
+        for (const matchType in result) {
+            const matches = result[matchType];
+
+            result[matchType] = _.orderBy(matches, "matchDate", "asc");
+        }
+
+        return result;
     };
 
     create = async (match: CreateMatchDTO): Promise<MatchData> => {
