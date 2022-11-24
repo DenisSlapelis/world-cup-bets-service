@@ -3,28 +3,39 @@ import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
 import { ResultSetHeader } from 'mysql2';
+import { wolrdCupAPIService } from '@app/integrations/world-cup.service';
 
 export class MatchService {
 
     constructor() {
     }
 
-    _findAllByCup = async (cupId: number): Promise<Array<IMatch>> => {
-        return database.execute<Array<IMatch>>(`
+    _findAllByCup = async (cupId: number, filter?: Record<string, any>): Promise<Array<IMatch>> => {
+        const params = [cupId];
+
+        const result = await database.execute<Array<IMatch>>(`
             SELECT
-                id,
-                cup_id AS cupId,
-                team_a_id AS teamIdA,
-                team_b_id AS teamIdB,
-                score_a AS scoreA,
-                score_b AS scoreB,
-                type,
-                match_date AS matchDate
+                m.id,
+                m.cup_id AS cupId,
+                m.team_a_id AS teamIdA,
+                m.team_b_id AS teamIdB,
+                m.score_a AS scoreA,
+                m.score_b AS scoreB,
+                m.type,
+                m.match_date AS matchDate,
+                t.tag AS team_a_tag,
+                t2.tag AS team_b_tag
             FROM
-                \`match\`
+                \`match\` m
+                INNER JOIN team t ON m.team_a_id = t.id
+                INNER JOIN team t2 ON m.team_b_id = t2.id
             WHERE
                 cup_id = ?
-        `, [cupId]);
+                ${filter?.todayMatches ? 'AND DAY(match_date) = DAY(NOW())' : ''}
+                ${filter?.scheduledMatches ? 'AND (score_a IS NULL OR score_b IS NULL)' : ''}
+        `, params);
+
+        return result;
     };
 
     findAllFinishedMatches = async (cupId: number): Promise<Array<IMatch>> => {
@@ -183,6 +194,23 @@ export class MatchService {
         return updatedMatch;
     };
 
+    syncMatchResults = async () => {
+        const [completedMatches, todayMatches] = await Promise.all([
+            wolrdCupAPIService.matchesToday({completed: true}),
+            this._findAllByCup(1, {todayMatches: true, scheduledMatches: true}),
+        ]);
+
+        for (const apiMatch of completedMatches) {
+            const apiTeamA = apiMatch.homeTeam;
+            const apiTeamB = apiMatch.awayTeam;
+
+            const matchId = todayMatches.find(match => (match.team_a_tag === apiTeamA.country) && (match.team_b_tag === apiTeamB.country))?.id;
+
+            if (matchId){
+                await this.update(matchId, {scoreA: apiTeamA.goals, scoreB: apiTeamB.goals});
+            }
+        }
+    }
 }
 
 export const matchService = new MatchService();

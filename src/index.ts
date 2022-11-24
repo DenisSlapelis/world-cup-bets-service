@@ -5,6 +5,7 @@ import environment from '@env';
 import { router as routes } from './routes';
 import { logger, errorLogger } from '@logger';
 import { getUserMiddleware } from './routes/middlewares';
+import { cronService } from '@app/cron/cron.service';
 
 const app = express();
 
@@ -34,6 +35,9 @@ if (environment.listenMode === 'TRUE') {
     console.log(`== SWAGGER DOCUMENTATION CAN BE FOUND ON http://localhost:${port}/api/v1/doc/ \n`);
 
     app.listen(port);
+
+    // start cron
+    cronService.start();
 }
 
 export const syncWatchLaterService = functions.https.onRequest(app);
