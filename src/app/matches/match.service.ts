@@ -201,13 +201,16 @@ export class MatchService {
         ]);
 
         for (const apiMatch of completedMatches) {
-            const apiTeamA = apiMatch.homeTeam;
-            const apiTeamB = apiMatch.awayTeam;
+            const {country: teamTagA, goals: scoreA} = apiMatch?.homeTeam;
+            const {country: teamTagB, goals: scoreB} = apiMatch?.awayTeam;
 
-            const matchId = todayMatches.find(match => (match.team_a_tag === apiTeamA.country) && (match.team_b_tag === apiTeamB.country))?.id;
+            const convertedTagA = wolrdCupAPIService.teamTagsDict[teamTagA];
+            const convertedTagB = wolrdCupAPIService.teamTagsDict[teamTagB];
+
+            const matchId = todayMatches.find(match => (match.team_a_tag === convertedTagA) && (match.team_b_tag === convertedTagB))?.id;
 
             if (matchId){
-                await this.update(matchId, {scoreA: apiTeamA.goals, scoreB: apiTeamB.goals});
+                await this.update(matchId, {scoreA, scoreB});
             }
         }
     }
