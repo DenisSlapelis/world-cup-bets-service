@@ -17,6 +17,7 @@ export class MatchController {
         const router = Router();
 
         router.post('/', this.create);
+        router.post('/sync', this.syncMatchResults);
         router.get('/', this.getAllMatchesByCupAndUser);
         router.get('/:id', this.getById);
         router.patch('/:id', this.updateById);
@@ -83,6 +84,16 @@ export class MatchController {
             const id = req.params.id;
 
             const result = await this.service.update(id, req.body);
+
+            res.status(200).json(result);
+        } catch (err: any) {
+            res.status(500).json(formatErrorResponse(err, res));
+        }
+    };
+
+    syncMatchResults = async (req: any, res: any) => {
+        try {
+            const result = await this.service.syncMatchResults();
 
             res.status(200).json(result);
         } catch (err: any) {
