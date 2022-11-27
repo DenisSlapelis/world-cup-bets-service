@@ -1,9 +1,10 @@
-import { CreateMatchDTO, GeralMatchDB, IMatch, MatchData, UpdateMatchDTO } from './match.models';
+import { ConsolidatedMatchDTO, CreateMatchDTO, GeralMatchDB, IMatch, MatchData, MatchTypeENUM, MatchTypeTitlesENUM, UpdateMatchDTO } from './match.models';
 import { database } from '@database';
 import { betService } from '@app/bets/bet.service';
 import * as _ from 'lodash';
 import { ResultSetHeader } from 'mysql2';
 import { wolrdCupAPIService } from '@app/integrations/world-cup.service';
+import dayjs from 'dayjs';
 
 export class MatchService {
 
@@ -61,7 +62,7 @@ export class MatchService {
     getConsolidatedMatches = async (userId: number, filters: Record<string, any>, cupId: number): Promise<Array<GeralMatchDB>> => {
         const params = [userId, cupId];
 
-        const { team } = filters;
+        const { team, status } = filters;
 
         return database.execute<Array<GeralMatchDB>>(`
             SELECT
@@ -96,6 +97,7 @@ export class MatchService {
             WHERE
                 cup_id = ?
                 ${team ? `AND (UPPER(t.name) LIKE '%${team.toUpperCase()}%' OR UPPER(t2.name) LIKE '%${team.toUpperCase()}%')` : ''}
+                ${status ? 'AND (m.score_a IS NULL AND m.score_b IS NULL)': ''}
         `, params);
     };
 
@@ -119,11 +121,8 @@ export class MatchService {
         return result;
     };
 
-    findAllByCup = async (reqUserId: number, filters: Record<string, any>): Promise<any> => {
-        const { userId } = filters;
-        const data = await this.getConsolidatedMatches(userId || reqUserId, filters, 1);
-
-        const formattedData = data.map(row => {
+    formatConsolidateObject = (data: Array<GeralMatchDB>, reqUserId: number, userId: number) => {
+        return data.map(row => {
             const matchDate = row.match_date;
             const matchScoreA = row.match_score_a;
             const matchScoreB = row.match_score_b;
@@ -134,6 +133,7 @@ export class MatchService {
                 matchScoreB,
                 matchType: row.match_type,
                 matchDate,
+                formattedMatchDate: dayjs(matchDate).format('YYYY-MM-DD'),
                 teamIdA: row.team_a_id,
                 teamNameA: row.team_a_name,
                 teamTagA: row.team_a_tag,
@@ -149,8 +149,10 @@ export class MatchService {
                 canEdit: betService.getCanEdit(matchDate, matchScoreA, matchScoreB, reqUserId, userId),
             };
         });
+    }
 
-        const result =_.groupBy(formattedData, "matchType");
+    parseResultGroupByType = (data: Array<ConsolidatedMatchDTO>) => {
+        const result =_.groupBy(data, "matchType");
 
         for (const matchType in result) {
             const matches = result[matchType];
@@ -159,6 +161,49 @@ export class MatchService {
         }
 
         return result;
+    }
+
+    formatNameByType = (type: MatchTypeENUM, date: string) => {
+        const titles = {...MatchTypeTitlesENUM};
+
+        return `${titles[type]} - ${dayjs(date).format('DD/MM/YYYY')}`;
+    }
+
+    parseResultGroupByRemainingDates = (data: Array<ConsolidatedMatchDTO>) => {
+        const result = [];
+        const groupByDateMatches = _.groupBy(data, "formattedMatchDate");
+
+        for (const matchDate in groupByDateMatches) {
+            const matches = _.orderBy(groupByDateMatches[matchDate], "matchDate", "asc");
+            const date =  dayjs(matchDate).format('YYYY-MM-DD');
+            const type = _.first(matches)?.matchType;
+
+            const formattedResult = {
+                name: this.formatNameByType(type as MatchTypeENUM, date),
+                date,
+                matches,
+            }
+
+            result.push(formattedResult);
+        }
+
+        return _.orderBy(result, "date", "asc");
+    }
+
+    findAllByCup = async (reqUserId: number, filters: Record<string, any>): Promise<any> => {
+        const { userId, status } = filters;
+        const data = await this.getConsolidatedMatches(userId || reqUserId, filters, 1);
+
+        const formattedData: Array<ConsolidatedMatchDTO> = this.formatConsolidateObject(data, reqUserId, userId);
+
+        const resultStatus = status || 'types';
+
+        const resultFormat: Record<any, any> = {
+            'remaining': this.parseResultGroupByRemainingDates(formattedData),
+            'types': this.parseResultGroupByType(formattedData),
+        }
+
+        return resultFormat[resultStatus];
     };
 
     create = async (match: CreateMatchDTO): Promise<MatchData> => {
