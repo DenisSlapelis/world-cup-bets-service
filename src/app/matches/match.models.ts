@@ -18,6 +18,22 @@ export enum MatchTypeENUM {
     FINAL = 'FINAL',
 }
 
+export enum MatchTypeTitlesENUM {
+    GROUP_A = 'Fase de Grupos',
+    GROUP_B = 'Fase de Grupos',
+    GROUP_C = 'Fase de Grupos',
+    GROUP_D = 'Fase de Grupos',
+    GROUP_E = 'Fase de Grupos',
+    GROUP_F = 'Fase de Grupos',
+    GROUP_G = 'Fase de Grupos',
+    GROUP_H = 'Fase de Grupos',
+    ROUND_OF_16 = 'Oitavas de Final',
+    QUARTER_FINAL = 'Quartas de Final',
+    SEMI_FINAL = 'Semifinal',
+    THIRD_PLACE = 'Disputa do 3º lugar',
+    FINAL = 'Final',
+}
+
 export enum MatchTypeWeightsENUM {
     GROUP_A = 1,
     GROUP_B = 1,
@@ -111,4 +127,25 @@ export interface UpdateMatchDTO {
     scoreA?: number;
     scoreB?: number;
     matchDate?: Date;
+}
+
+export interface ConsolidatedMatchDTO {
+    matchId: number;
+    matchScoreA: number | null;
+    matchScoreB: number | null;
+    matchType: string;
+    matchDate: Date;
+    teamIdA: number;
+    teamNameA: string;
+    teamTagA: string;
+    teamAvatarA: string;
+    teamIdB: number;
+    teamNameB: string;
+    teamTagB: string;
+    teamAvatarB: string;
+    betId: number;
+    betScoreA: number | null;
+    betScoreB: number | null;
+    totalPoints: number;
+    canEdit: boolean;
 }
