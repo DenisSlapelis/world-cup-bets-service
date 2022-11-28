@@ -43,7 +43,12 @@ export class WorldCupAPIervice {
     }
 
     matchesToday = async (options: Record<string, any>) => {
-        const { data } = await axios.get<Array<any>>(BASE_API_URL);
+        const { data } = await axios.get<Array<any>>(BASE_API_URL, {
+            headers: {
+                'accept-encoding': null,
+            }
+        });
+
 
         if (options.completed)
             return data.filter((item: any) => item.status === 'completed');
