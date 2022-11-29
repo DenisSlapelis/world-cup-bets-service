@@ -256,6 +256,12 @@ export class MatchService {
 
             if (matchId){
                 await this.update(matchId, {scoreA, scoreB});
+            } else {
+                const inverseMatchId = todayMatches.find(match => (match.team_a_tag === convertedTagB) && (match.team_b_tag === convertedTagA))?.id;
+
+                if (inverseMatchId) {
+                    await this.update(inverseMatchId, {scoreA: scoreB, scoreB: scoreA });
+                }
             }
         }
     }
