@@ -229,6 +229,13 @@ export class BetService {
         return !sameUser ? false : todayIsBeforeMatch && scoreAIsNull && scoreBIsNull;
     }
 
+    getCanShow = (matchDate: Date, reqUserId: number, userId: number | undefined) => {
+        const sameUser = !userId || reqUserId == userId;
+        const todayIsAfterMatch = dayjs().isAfter(matchDate);
+
+        return sameUser ? true : todayIsAfterMatch;
+    }
+
     import = async (userId: number) => {
         const [matchData, teamData] = await Promise.all([
             matchService._findAllByCup(1),
