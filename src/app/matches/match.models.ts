@@ -148,4 +148,5 @@ export interface ConsolidatedMatchDTO {
     betScoreB: number | null;
     totalPoints: number;
     canEdit: boolean;
+    canShow: boolean;
 }
