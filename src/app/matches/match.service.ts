@@ -97,7 +97,7 @@ export class MatchService {
             WHERE
                 cup_id = ?
                 ${team ? `AND (UPPER(t.name) LIKE '%${team.toUpperCase()}%' OR UPPER(t2.name) LIKE '%${team.toUpperCase()}%')` : ''}
-                ${status ? 'AND (m.score_a IS NULL AND m.score_b IS NULL)': ''}
+                ${status ? 'AND DATE(m.match_date) >= DATE(DATE_SUB(NOW(), INTERVAL 3 HOUR))': ''}
         `, params);
     };
 
