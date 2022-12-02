@@ -62,7 +62,7 @@ export class MatchService {
     getConsolidatedMatches = async (userId: number, filters: Record<string, any>, cupId: number): Promise<Array<GeralMatchDB>> => {
         const params = [userId, cupId];
 
-        const { team, status } = filters;
+        const { teamId, teamName, teamTag, status } = filters;
 
         return database.execute<Array<GeralMatchDB>>(`
             SELECT
@@ -96,7 +96,9 @@ export class MatchService {
                 LEFT JOIN \`user\` u ON b.user_id = u.id
             WHERE
                 cup_id = ?
-                ${team ? `AND (UPPER(t.name) LIKE '%${team.toUpperCase()}%' OR UPPER(t2.name) LIKE '%${team.toUpperCase()}%')` : ''}
+                ${teamId ? `AND (t.id = ${teamId} OR t2.id = ${teamId})` : ''}
+                ${teamTag ? `AND (UPPER(t.tag) LIKE '%${teamTag.toUpperCase()}%' OR UPPER(t2.tag) LIKE '%${teamTag.toUpperCase()}%')` : ''}
+                ${teamName ? `AND (UPPER(t.name) LIKE '%${teamName.toUpperCase()}%' OR UPPER(t2.name) LIKE '%${teamName.toUpperCase()}%')` : ''}
                 ${status ? 'AND DATE(m.match_date) >= DATE(DATE_SUB(NOW(), INTERVAL 3 HOUR))': ''}
         `, params);
     };
