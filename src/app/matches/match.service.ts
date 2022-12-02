@@ -128,6 +128,7 @@ export class MatchService {
             const matchDate = row.match_date;
             const matchScoreA = row.match_score_a;
             const matchScoreB = row.match_score_b;
+            const canShow = betService.getCanShow(matchDate, reqUserId, userId);
 
             return {
                 matchId: row.match_id,
@@ -145,11 +146,11 @@ export class MatchService {
                 teamTagB: row.team_b_tag,
                 teamAvatarB: row.team_b_avatar,
                 betId: row.bet_id,
-                betScoreA: row.bet_score_a,
-                betScoreB: row.bet_score_b,
+                betScoreA: canShow ? row.bet_score_a : null,
+                betScoreB: canShow ? row.bet_score_b : null,
                 totalPoints: row.bet_total_points,
                 canEdit: betService.getCanEdit(matchDate, matchScoreA, matchScoreB, reqUserId, userId),
-                canShow: betService.getCanShow(matchDate, reqUserId, userId),
+                canShow,
             };
         });
     }
