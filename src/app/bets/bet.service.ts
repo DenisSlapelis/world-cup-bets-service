@@ -8,7 +8,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { MatchData, MatchTypeENUM, MatchTypeWeightsENUM } from '@app/matches/match.models';
 import { teamService } from '@app/teams/teams.service';
 import { excelData } from './import-data';
-import { isNaN, isNull } from 'lodash';
+import { floor, isNaN, isNull } from 'lodash';
 import _ = require('lodash');
 import { ResultSetHeader } from 'mysql2';
 
@@ -199,7 +199,7 @@ export class BetService {
     applyWeightByRound = (basePoints: number, matchType: MatchTypeENUM) => {
         const weights = {...MatchTypeWeightsENUM};
 
-        return Math.imul(basePoints, weights[matchType]);
+        return floor(basePoints * weights[matchType]);
     }
 
     calculatePoints = (bet: BetResponse, match: MatchData) => {
