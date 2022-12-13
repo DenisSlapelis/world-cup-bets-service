@@ -299,8 +299,12 @@ export class BetService {
         const matches = await matchService.findAllFinishedMatches(1);
 
         for (const match of matches) {
+            console.log('== match id: ', match.id);
+
             await this.updateBetPointsByMatch(match);
         }
+
+        console.log('== FINISH REACALCULATE POINTS');
     }
 }
 
