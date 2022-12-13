@@ -71,3 +71,15 @@ INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date
 INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 6, 4, 'ROUND_OF_16', '2022-12-04 19:00');
 INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 20, 23, 'ROUND_OF_16', '2022-12-05 15:00');
 INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 24, 19, 'ROUND_OF_16', '2022-12-06 15:00');
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 25, 29, 'ROUND_OF_16', '2022-12-05 19:00');
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 31, 27, 'ROUND_OF_16', '2022-12-06 19:00');
+
+-- QUARTAS
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 23, 25, 'QUARTER_FINAL', '2022-12-09 15:00');
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 3, 9, 'QUARTER_FINAL', '2022-12-09 19:00');
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 24, 31, 'QUARTER_FINAL', '2022-12-10 15:00');
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 6, 15, 'QUARTER_FINAL', '2022-12-10 19:00');
+
+-- SEMI
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 9, 23, 'SEMI_FINAL', '2022-12-13 19:00');
+INSERT INTO I0ZwBCwClr.`match` (cup_id, team_a_id, team_b_id, `type`, match_date) VALUES (1, 15, 24, 'SEMI_FINAL', '2022-12-14 19:00');
