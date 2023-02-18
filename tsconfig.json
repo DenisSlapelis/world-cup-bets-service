@@ -20,7 +20,7 @@
             "@logger": ["./src/logger/index"],
             "@database": ["./src/database/index"],
             "@helpers": ["./src/helpers/index"],
-            "@constants": ["./src/constants/index"],
+            "@constants": ["./src/constants/index"]
         }
     },
     "compileOnSave": true,
