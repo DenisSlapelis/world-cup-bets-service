@@ -11,6 +11,7 @@ import { excelData } from './import-data';
 import { floor, isNaN, isNull } from 'lodash';
 import _ = require('lodash');
 import { ResultSetHeader } from 'mysql2';
+import { environment as env } from '@env';
 
 export class BetService {
     constructor() {
@@ -74,7 +75,7 @@ export class BetService {
     };
 
     create = async (bets: Array<BetCreateDTO>, userId: number): Promise<Array<BetResponse>> => {
-        const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
+        const perChunk = env.betChunkValue ?? 3;
 
         const allBets = _.chunk(bets, parseInt(perChunk.toString()));
 
@@ -121,7 +122,7 @@ export class BetService {
     }
 
     update = async (bets: Array<BetUpdateDTO>, userId: number): Promise<void> => {
-        const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
+        const perChunk = env.betChunkValue ?? 3;
 
         const allBets = _.chunk(bets, parseInt(perChunk.toString()));
 
@@ -276,7 +277,7 @@ export class BetService {
     updateBetPointsByMatch = async (match: MatchData) => {
         const bets = await this.findAllByMatch(match.id);
 
-        const perChunk = process.env.BET_CHUNK_VALUE ?? 3;
+        const perChunk = env.betChunkValue ?? 3;
 
         const allBets = _.chunk(bets, parseInt(perChunk.toString()));
 

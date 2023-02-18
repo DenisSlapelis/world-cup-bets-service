@@ -1,7 +1,8 @@
 import { matchService } from '@app/matches/match.service';
+import { environment as env } from '@env';
 import cron from 'node-cron';
 
-const cronExpression: string = process.env.CRON_CONFIG || '* * * * *';
+const cronExpression: string = env.cronConfig || '* * * * *';
 
 export class CronService {
     private _cron: cron.ScheduledTask;

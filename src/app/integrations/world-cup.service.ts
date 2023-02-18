@@ -1,6 +1,7 @@
+import { environment as env } from '@env';
 import axios from 'axios';
 
-const BASE_API_URL: string = process.env.WORLD_CUP_API || 'localhost:8000';
+const BASE_API_URL: string = env.worldCupApi || 'localhost:8000';
 
 export class WorldCupAPIervice {
     teamTagsDict: Record<string, any>;
