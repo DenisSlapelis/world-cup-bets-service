@@ -6,6 +6,7 @@ import { router as routes } from './routes';
 import { logger, errorLogger } from '@logger';
 import { getUserMiddleware } from './routes/middlewares';
 import { cronService } from '@app/cron/cron.service';
+import { danielDaBahia } from '@constants';
 
 const app = express();
 
@@ -39,5 +40,7 @@ if (environment.listenMode === 'TRUE') {
     // start cron
     cronService.start();
 }
+
+console.log(`${danielDaBahia} \nBOM DIA MARCELO, INICIOU APLICAÇÃO`)
 
 export const syncWatchLaterService = functions.https.onRequest(app);
